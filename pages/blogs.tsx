@@ -1,26 +1,36 @@
 import BlogCard from "@/components/BlogCard";
-import { NextPage } from "next";
+import { InferGetStaticPropsType, NextPage } from "next";
 
-interface Props {}
+interface PostApiResponse {
+  data: {
+    title: string;
+    meta: string;
+    slug: string;
+  }[];
+}
 
-const Blogs: NextPage<Props> = () => {
+export const getStaticProps = async () => {
+  const { data }: PostApiResponse = await fetch(
+    "http://localhost:3000/api/posts"
+  ).then((data) => data.json());
+  return {
+    props: { posts: data },
+  };
+};
+
+type Props = InferGetStaticPropsType<typeof getStaticProps>;
+
+const Blogs: NextPage<Props> = ({ posts }) => {
   return (
     <div className=" max-w-3xl mx-auto  rounded space-y-5">
-      <BlogCard
-        title="my first blog"
-        desc="  ipsum dolor sit amet, consectetur adipisicing elit. Nulla sunt doloribus quos necessitatibus nam dolore. Corrupti eaque nam illum facere.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nulla sunt doloribus quos necessitatibus nam dolore. Corrupti eaque nam illum facere "
-      />
-      <BlogCard
-        title="my first blog"
-        desc="  ipsum dolor sit amet, consectetur adipisicing elit. Nulla sunt doloribus quos necessitatibus nam dolore. Corrupti eaque nam illum facere.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nulla sunt doloribus quos necessitatibus nam dolore. Corrupti eaque nam illum facere "
-      />
-      <BlogCard
-        title="my first blog"
-        desc="  ipsum dolor sit amet, consectetur adipisicing elit. Nulla sunt doloribus quos necessitatibus nam dolore. Corrupti eaque nam illum facere.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nulla sunt doloribus quos necessitatibus nam dolore. Corrupti eaque nam illum facere "
-      />
+      {posts.map((post) => (
+        <BlogCard
+          key={post.slug}
+          title={post.title}
+          desc={post.meta}
+          slug={post.slug}
+        />
+      ))}
     </div>
   );
 };
