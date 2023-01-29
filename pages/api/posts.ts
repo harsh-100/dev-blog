@@ -8,7 +8,7 @@ const handler: NextApiHandler = (req, res) => {
   switch (method) {
     case "GET": {
       const data = getPostData();
-      return res.json({ ok: data });
+      return res.json({ data });
     }
 
     default:
@@ -20,12 +20,12 @@ const getPostData = () => {
   const folderToReadPath = path.join(process.cwd(), "posts");
   const fileNames = fs.readdirSync(folderToReadPath);
 
-  fileNames.map((oneFile) => {
+  return fileNames.map((oneFile) => {
     const filePathToRead = path.join(folderToReadPath, oneFile);
     const fileData = fs.readFileSync(filePathToRead, { encoding: "utf-8" });
-    console.log(matter(fileData));
+    return matter(fileData).data;
   });
 
-  return fileNames;
+  // return data;
 };
 export default handler;
